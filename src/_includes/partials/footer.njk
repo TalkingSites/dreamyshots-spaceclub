@@ -1,6 +1,6 @@
 <footer class="ds-footer" id="footer-main">
   <span class="ds-footer-copy">
-    &copy; {{ global.currentYear }} {{ site.name }}
+    &copy; {{ global.currentYear }} <i class="bi bi-camera2" aria-hidden="true" style="vertical-align:middle;font-size:1.4em;"></i> {{ site.name }}
   </span>
   <ul class="ds-footer-links">
     {% for item in navbar %}
@@ -11,5 +11,5 @@
     {% endif %}
     {% endfor %}
   </ul>
-  <a href="{{ site.bookingUrl }}" class="ds-footer-book">Book an event</a>
+  <a href="{{ site.bookingUrl }}" class="ds-footer-book" target="_blank" rel="noopener noreferrer">Book an event <i class="bi bi-arrow-up-right" aria-hidden="true" style="font-size:0.7em;"></i></a>
 </footer>
