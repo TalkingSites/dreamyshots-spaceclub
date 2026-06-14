@@ -5,8 +5,6 @@ description: Book Dreamy Shots for your next event. Select a date and time to ge
 permalink: "/book/"
 bookingPage: true
 ---
-<script>window.__DS_STRIPE = "{{ site.stripePaymentLink | default('') }}";</script>
-
 <div class="ds-booking-wrap">
 
   <div class="ds-booking-steps-bar" id="ds-booking-steps-bar">
@@ -75,7 +73,17 @@ bookingPage: true
       <p class="ds-booking-intro">A few more things before we confirm your shoot.</p>
     </div>
 
-    <form class="ds-booking-form" id="ds-booking-form" novalidate>
+    <form class="ds-booking-form" id="ds-booking-form"
+          name="booking" method="POST"
+          data-netlify="true" netlify-honeypot="bot-field"
+          novalidate>
+
+      <p hidden aria-hidden="true">
+        <label>Do not fill this in: <input name="bot-field" tabindex="-1" autocomplete="off"/></label>
+      </p>
+      <input type="hidden" name="date" id="b-date">
+      <input type="hidden" name="startTime" id="b-start-time">
+      <input type="hidden" name="endTime" id="b-end-time">
 
       <div class="ds-form-group">
         <label class="ds-form-label" for="b-name">Contact name <span class="ds-required-mark" aria-hidden="true">*</span></label>
@@ -131,10 +139,19 @@ bookingPage: true
         <button type="button" class="ds-booking-btn-back" id="ds-booking-back">
           <i class="bi bi-arrow-left" aria-hidden="true"></i> Back
         </button>
-        <button type="submit" class="ds-booking-btn">
-          Proceed to Payment
-          <i class="bi bi-lock-fill" aria-hidden="true" style="font-size:0.8em;"></i>
-        </button>
+        <div class="ds-payment-btns">
+          <div class="ds-pay-now-wrap">
+            <button type="button" class="ds-booking-btn" disabled aria-disabled="true">
+              Pay Now
+              <i class="bi bi-lock-fill" aria-hidden="true" style="font-size:0.8em;"></i>
+            </button>
+            <span class="ds-coming-soon-badge">Coming Soon</span>
+          </div>
+          <button type="submit" class="ds-booking-btn">
+            Pay by Invoice
+            <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
+          </button>
+        </div>
       </div>
 
     </form>

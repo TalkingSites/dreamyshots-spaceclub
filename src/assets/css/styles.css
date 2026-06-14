@@ -1286,6 +1286,31 @@ html[data-bs-theme="light"] .ds-slot-range   { background: rgba(160, 108, 58, 0.
 .ds-booking-btn:hover:not(:disabled) { background: var(--ds-accent); color: var(--ds-bg); }
 .ds-booking-btn:disabled             { opacity: 0.3; cursor: not-allowed; }
 
+.ds-payment-btns {
+  display:     flex;
+  align-items: flex-end;
+  gap:         0.75rem;
+  flex-wrap:   wrap;
+}
+
+.ds-pay-now-wrap {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            0.35rem;
+}
+
+.ds-coming-soon-badge {
+  font-size:      0.6rem;
+  font-weight:    600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color:          var(--ds-text-muted);
+  border:         1px solid var(--ds-text-muted);
+  border-radius:  1rem;
+  padding:        0.1rem 0.5rem;
+}
+
 .ds-booking-btn-back {
   background: none;
   border:     none;
