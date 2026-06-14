@@ -5,3 +5,5 @@ node_modules/
 package-lock.json
 posts/.obsidian/
 .env
+*.swp
+*.swo
