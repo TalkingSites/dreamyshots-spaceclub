@@ -3,9 +3,6 @@
 
   const MIN_HOURS = 2;
 
-  // ── Booked dates — loaded from Radicale on init ────────────────────────────
-  let remoteBookedDates = [];
-
   const SESSION_KEY = 'ds-session-bookings';
 
   function getSessionBookings() {
@@ -22,18 +19,7 @@
   }
 
   function isBooked(d) {
-    return remoteBookedDates.includes(d) || getSessionBookings().includes(d);
-  }
-
-  async function loadBookedDates() {
-    try {
-      const res  = await fetch('/.netlify/functions/get-booked-dates');
-      const data = await res.json();
-      if (Array.isArray(data.booked)) remoteBookedDates = data.booked;
-    } catch (e) {
-      // Falls back silently — calendar won't show remote bookings in local dev without Netlify CLI.
-    }
-    renderCalendar();
+    return getSessionBookings().includes(d);
   }
 
   // ── Time helpers ───────────────────────────────────────────────────────────
@@ -428,7 +414,7 @@
     $id('ds-gcal-btn').href = googleCalUrl();
   }
 
-  // ── Form submit → Radicale ────────────────────────────────────────────────
+  // ── Form submit → Netlify Forms ───────────────────────────────────────────
   async function onFormSubmit(e) {
     e.preventDefault();
     const form = e.target;
@@ -441,33 +427,28 @@
 
     const submitBtn = form.querySelector('[type="submit"]');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Saving…';
+    submitBtn.textContent = 'Sending…';
 
-    const payload = {
-      date:         state.selectedDate,
-      startTime:    state.startTime,
-      endTime:      state.endTime,
-      name:         form.querySelector('[name="name"]').value.trim(),
-      phone:        form.querySelector('[name="phone"]').value.trim(),
-      email:        form.querySelector('[name="email"]').value.trim(),
-      address:      form.querySelector('[name="address"]').value.trim(),
-      organisation: (form.querySelector('[name="organisation"]') || {}).value || '',
-      abn:          (form.querySelector('[name="abn"]') || {}).value || '',
-      food:         (form.querySelector('[name="food"]:checked') || {}).value || 'no',
-    };
+    // Populate hidden date/time fields before serialising
+    $id('b-date').value      = state.selectedDate;
+    $id('b-start-time').value = state.startTime;
+    $id('b-end-time').value   = state.endTime;
+
+    const params = new URLSearchParams();
+    params.set('form-name', 'booking');
+    new FormData(form).forEach((val, key) => params.set(key, val));
 
     try {
-      const res  = await fetch('/.netlify/functions/create-booking', {
+      const res = await fetch('/book/', {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body:    params.toString(),
       });
-      const data = await res.json();
 
       if (!res.ok) {
         submitBtn.disabled  = false;
-        submitBtn.innerHTML = 'Proceed to Payment <i class="bi bi-lock-fill" aria-hidden="true" style="font-size:0.8em;"></i>';
-        alert(data.error || 'Something went wrong. Please try again.');
+        submitBtn.textContent = 'Pay by Invoice';
+        alert('Something went wrong. Please try again.');
         return;
       }
 
@@ -481,8 +462,8 @@
       $id('ds-booking-steps-bar').hidden = true;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
-      submitBtn.disabled  = false;
-      submitBtn.innerHTML = 'Proceed to Payment <i class="bi bi-lock-fill" aria-hidden="true" style="font-size:0.8em;"></i>';
+      submitBtn.disabled    = false;
+      submitBtn.textContent = 'Pay by Invoice';
       alert('Network error. Please check your connection and try again.');
     }
   }
@@ -491,7 +472,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     if (!$id('ds-calendar')) return;
 
-    loadBookedDates(); // fetches from Radicale then calls renderCalendar()
+    renderCalendar();
 
     $id('ds-cal-prev').addEventListener('click', onPrevMonth);
     $id('ds-cal-next').addEventListener('click', onNextMonth);
